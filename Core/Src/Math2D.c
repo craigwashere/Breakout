@@ -134,3 +134,9 @@ int IsEqual(const vec2f *A, const vec2f *B)
 	return (A->x == B->x) && (A->y == B->y);
 }
 
+vec2f clamp(vec2f input, vec2f min, vec2f max)
+{
+	return make_vec2f(
+			fmaxf(min.x, fminf(input.x, max.x))
+		  , fmaxf(min.y, fminf(input.y, max.y)));
+}

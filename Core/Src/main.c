@@ -179,6 +179,8 @@ void setup_level(uint8_t level)
 
 void init()
 {
+	bricks_left = 0;
+
 	current_level = 1;
 
 	setup_level(current_level);
@@ -226,10 +228,10 @@ void draw_ball()
 void write_status_line(uint8_t max_level)
 {
 	  ssd1306_SetCursor(1, 1);
-	  char lives_text[20];
+	  char status[20];
 
-	  sprintf(lives_text, "Lives: %hu  %hu/%hu  %5u", lives, current_level, max_level, score);
-	  ssd1306_WriteString(lives_text, Font_6x8, White);
+	  sprintf(status, "Lives: %1hu  %1hu/%1hu  %5u", lives-1, current_level, max_level, score);
+	  ssd1306_WriteString(status, Font_6x8, White);
 }
 
 uint8_t read_buttons()
@@ -295,13 +297,6 @@ void update_paddle()
 		paddle.x = SSD1306_WIDTH - PADDLE_WIDTH;
 	else if (paddle.x <= LEFT_BOUND)
 		paddle.x = LEFT_BOUND;
-}
-
-vec2f clamp(vec2f input, vec2f min, vec2f max)
-{
-	return make_vec2f(
-			fmaxf(min.x, fminf(input.x, max.x))
-		  , fmaxf(min.y, fminf(input.y, max.y)));
 }
 
 enum DIRECTION vector_direction(vec2f *target)

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<head>
+	<title>Breakout Level Maker</title>
+</head>
+<body>
+	<div id="bytes"></div>
+	<div id="table></div>
+	<div id="reset">
+		<button onclick="reset_table()">RESET TABLE</button>
+	</div>
+</body>
+<script>
+	var ROWS = 5;
+	var COLS = 16;
+	var bytes = [0,0,0,0,0,0,0,0,0,0];
+	const reset_table = () => {
+		bytes.fill(0);
+		color_table();
+		print_bytes();
+	}
+	const get_table_data = () => {
+		const table = document.getElementById('table');
+		const table_data = new Array();
+		for (let i = 0; i < ROWS; i++)
+			for (let j = 0; j < COLS; j++)
+			{
+				table_data.push(parseInt(table.rows[i+1].cells[j+1].textContent));
+			}
+		return table_data;
+	}
+
+	const color_table = () => {
+		const table = document.getElementById('table');
+		for (let row = 0; row < ROWS; row++)
+			for (let col = 0; col < COLS; col++)
+			{
+				if (get_bit(row, col) == 1)
+					table.rows[row+1].cells[col+1].style.backgroundColor = 'green';
+				else 
+					table.rows[row+1].cells[col+1].style.backgroundColor = 'white';
+			}
+	}
+
+	const get_byte = (row, col) => {
+		return Math.floor(((row*COLS)+col)/8);
+	}
+
+	const get_bit = (row, col) => {
+		let byte = get_byte(row, col)
+		col -= (byte%2)*8;
+
+		return ((bytes[byte] >> (8-col-1)) & 1);
+	}
+
+	const toggle_bit = (row, col) => {
+		let byte = get_byte(row, col);
+		col -= (byte%2)*8;
+
+		bytes[byte] ^= (1 << (8-col-1));
+	}
+
+	const reset_display = () =>	{
+		const table = document.getElementById('table');
+		for (let row = 0; row < ROWS; row++)
+			for (let col = 0; col < COLS; col++)
+			{
+				table.rows[i+1].cells[j+1].textContent = get_bit(row, col);
+			}
+	}
+
+	const print_bytes = () => {
+		var bytes_div = document.getElementById('bytes');
+		bytes_div.innerHTML = "{ ";
+		for (let i = 0; i < bytes.length; i++)
+			bytes_div.innerHTML += "0x" + formatHex(bytes[i]) + ", ";
+		bytes_div.innerHTML = bytes_div.innerHTML.slice(0, -2);
+		bytes_div.innerHTML += " }";
+	}
+
+	function formatHex(number) 
+	{
+		const hex = number.toString(16);
+		return hex.length === 1 ? "0" + hex : hex;
+	}
+		
+	function tableCreate() 
+	{
+		const body = document.body
+				, tbl = document.createElement('table')
+				, header = 	tbl.createTHead();
+		tbl.style.border = '1px solid black';
+		tbl.setAttribute('id', 'table');
+
+		var row = header.insertRow(0);
+		var cell = row.insertCell(0);
+		for (let col = 0; col < COLS; col++)
+		{
+			var cell = row.insertCell(col+1);
+			cell.innerHTML = "<b>0x" + formatHex(col) + "</b>";
+		}
+
+		for (let row = 0; row < ROWS; row++) 
+		{
+			const tr = tbl.insertRow();
+			for (let col = 0; col <= COLS; col++) 
+			{
+				const td = tr.insertCell();
+				td.style.border = '1px solid black';
+
+				if (col == 0)
+					td.innerHTML = "<b>Row "+(row+1)+ "</b>";
+				
+				else {
+					td.appendChild(document.createTextNode('0'));
+					td.addEventListener('click', function() {
+        					// 'this' refers to the clicked <td> element
+        					//console.log('byte clicked:', get_byte(row, col)); 
+        					// Perform actions based on the clicked cell
+						toggle_bit(row, col-1);
+						this.innerHTML = (this.innerHTML == '0')? '1': '0';
+						color_table();
+						print_bytes();
+    					});
+				}
+			}
+		}
+		body.appendChild(tbl);
+	}
+
+	tableCreate();
+	print_bytes();
+</script>

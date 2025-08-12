@@ -50,3 +50,4 @@ vec2f Addf(const vec2f *a, const vec2f *b);
 vec2f Subtractf(const vec2f *A, const vec2f *B);
 vec2f Multiplyf(const vec2f *A, float scalar);
 int IsEqual(const vec2f *A, const vec2f *B);
+vec2f clamp(vec2f input, vec2f min, vec2f max);
